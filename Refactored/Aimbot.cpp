@@ -54,29 +54,12 @@ public:
         {
             m_lockedOnPlayer = findClosestEnemy();
             m_inSession = true;
-            printf("New player locked: %p\n", (void*)m_lockedOnPlayer);  // Debug print
         }
-        if (!m_level->isPlayable())
+        // If the target is not valid or is not visible, keep the mouse where it is and return.
+        else if (m_lockedOnPlayer == nullptr || !m_lockedOnPlayer->isVisible())
         {
-            m_lockedOnPlayer = nullptr;
             return;
         }
-        if (m_localPlayer->isDead())
-        {
-            m_lockedOnPlayer = nullptr;
-            return;
-        }
-        if (m_localPlayer->isKnocked())
-        {
-            m_lockedOnPlayer = nullptr;
-            return;
-        }
-        if (m_configLoader->getAimbotTrigger() == 0x0000) // our trigger is localplayer attacking
-            if (!m_localPlayer->isInAttack())
-            {
-                m_lockedOnPlayer = nullptr;
-                return;
-            }
 
         // get desired angle to an enemy
         double desiredViewAngleYaw = 0;

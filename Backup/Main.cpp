@@ -29,8 +29,6 @@ int main(int argc, char *argv[])
         return -1;
     }
     Level *level = new Level();
-
-    // Instantiate LocalPlayer, X11Utils, players, Aimbot, Sense, and NoRecoil
     LocalPlayer *localPlayer = new LocalPlayer();
     X11Utils *x11Utils = new X11Utils();
     std::vector<Player *> *players = new std::vector<Player *>;
@@ -38,11 +36,9 @@ int main(int argc, char *argv[])
     {
         players->push_back(new Player(i));
     }
-    
-    Aimbot *aimbot = new Aimbot(configLoader, level, localPlayer, players, x11Utils);  // Instantiate Aimbot before Sense
-    Sense *sense = new Sense(configLoader, level, localPlayer, players, x11Utils, aimbot);  // Pass the Aimbot instance to Sense
+    Sense *sense = new Sense(configLoader, level, localPlayer, players, x11Utils);
     NoRecoil *noRecoil = new NoRecoil(configLoader, level, localPlayer, players, x11Utils);
-
+    Aimbot *aimbot = new Aimbot(configLoader, level, localPlayer, players, x11Utils);
 
     // Main loop
     printf("MYAPEX STARTING MAIN LOOP\n");

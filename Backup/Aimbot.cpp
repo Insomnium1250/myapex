@@ -18,8 +18,6 @@ private:
     X11Utils *m_x11Utils;
 
     Player *m_lockedOnPlayer = nullptr;
-    
-    bool m_inSession = false;
 
 public:
     Aimbot(ConfigLoader *configLoader,
@@ -34,27 +32,16 @@ public:
         m_players = players;
         m_x11Utils = x11Utils;
     }
-
-    Player *getLockedOnPlayer()
-    {
-        return m_lockedOnPlayer;
-    }
-
     void update()
     {
-        // If the aimbot button is not pressed, end the session and reset the target.
-        if (!m_x11Utils->keyDown(m_configLoader->getAimbotTrigger()))
-        {
-            m_lockedOnPlayer = nullptr;
-            m_inSession = false;
-            return;
-        }
-        // If the session has not started, start a new session and select a new target.
-        else if (!m_inSession)
-        {
-            m_lockedOnPlayer = findClosestEnemy();
-            m_inSession = true;
-            printf("New player locked: %p\n", (void*)m_lockedOnPlayer);  // Debug print
+        // validations
+        if (m_configLoader->getAimbotTrigger() != 0x0000)
+        { // our trigger is a button
+            if (!m_x11Utils->keyDown(m_configLoader->getAimbotTrigger()))
+            {
+                m_lockedOnPlayer = nullptr;
+                return;
+            }
         }
         if (!m_level->isPlayable())
         {
