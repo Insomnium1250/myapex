@@ -92,8 +92,7 @@ public:
 
     double calculatePitchAngleDelta(double oldAngle, double newAngle)
     {
-        double wayA = newAngle - oldAngle;
-        return wayA;
+        return newAngle - oldAngle;
     }
 
     double calculateAngleDelta(double oldAngle, double newAngle)
@@ -102,9 +101,7 @@ public:
         double wayB = 360 - abs(wayA);
         if (wayA > 0 && wayB > 0)
             wayB *= -1;
-        if (abs(wayA) < abs(wayB))
-            return wayA;
-        return wayB;
+        return (abs(wayA) < abs(wayB)) ? wayA : wayB;
     }
 
     double calculateDesiredYaw(double localPlayerLocationX, double localPlayerLocationY,
