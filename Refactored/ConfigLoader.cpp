@@ -17,16 +17,12 @@ private:
     bool m_featureAimbotOn = false;
     bool m_featureNoRecoilOn = false;
     bool m_featureSenseOn = false;
-    bool m_featureTriggerbotOn = false;
 
     // aimbot
     int m_aimbotTrigger = 0x0000;
     int m_aimbotSmoothing = 999999;
     int m_aimbotActivationFOV = 0;
     int m_aimbotMaxRange = 0;
-
-    // triggerbot
-    int m_triggerbotTrigger = 0x0000;
 
     // norecoil
     double m_norecoilPitchStrength = 0;
@@ -82,14 +78,11 @@ private:
             m_featureAimbotOn = (lineKey.compare("FEATURE_AIMBOT_ON") != 0) ? m_featureAimbotOn : utils::toBool(lineValue);
             m_featureNoRecoilOn = (lineKey.compare("FEATURE_NORECOIL_ON") != 0) ? m_featureNoRecoilOn : utils::toBool(lineValue);
             m_featureSenseOn = (lineKey.compare("FEATURE_SENSE_ON") != 0) ? m_featureSenseOn : utils::toBool(lineValue);
-            m_featureTriggerbotOn = (lineKey.compare("FEATURE_TRIGGERBOT_ON") != 0) ? m_featureTriggerbotOn : utils::toBool(lineValue);
             // aimbot
             m_aimbotTrigger = (lineKey.compare("AIMBOT_TRIGGER") != 0) ? m_aimbotTrigger : stoi(lineValue, 0, 16);
             m_aimbotSmoothing = (lineKey.compare("AIMBOT_SMOOTHING") != 0) ? m_aimbotSmoothing : stoi(lineValue);
             m_aimbotActivationFOV = (lineKey.compare("AIMBOT_ACTIVATION_FOV") != 0) ? m_aimbotActivationFOV : stoi(lineValue);
             m_aimbotMaxRange = (lineKey.compare("AIMBOT_MAX_RANGE") != 0) ? m_aimbotMaxRange : stoi(lineValue);
-            // triggerbot
-            m_triggerbotTrigger = (lineKey.compare("TRIGGERBOT_TRIGGER") != 0) ? m_triggerbotTrigger : stoi(lineValue, 0, 16);
             // norecoil
             m_norecoilPitchStrength = (lineKey.compare("NORECOIL_PITCH_STRENGTH") != 0) ? m_norecoilPitchStrength : stod(lineValue);
             m_norecoilYawStrength = (lineKey.compare("NORECOIL_YAW_STRENGTH") != 0) ? m_norecoilYawStrength : stod(lineValue);
@@ -103,14 +96,11 @@ private:
         printf("FEATURE_AIMBOT_ON \t\t%s\n", m_featureAimbotOn ? "true" : "false");
         printf("FEATURE_NORECOIL_ON \t\t%s\n", m_featureNoRecoilOn ? "true" : "false");
         printf("FEATURE_SENSE_ON \t\t%s\n", m_featureSenseOn ? "true" : "false");
-        printf("FEATURE_TRIGGERBOT_ON \t\t%s\n", m_featureTriggerbotOn ? "true" : "false");
 
         printf("AIMBOT_TRIGGER \t\t\t%d\n", m_aimbotTrigger);
         printf("AIMBOT_SMOOTHING \t\t%d\n", m_aimbotSmoothing);
         printf("AIMBOT_ACTIVATION_FOV \t\t%d\n", m_aimbotActivationFOV);
         printf("AIMBOT_MAX_RANGE \t\t%d\n", m_aimbotMaxRange);
-
-        printf("TRIGGERBOT_TRIGGER \t\t%d\n", m_triggerbotTrigger);
 
         printf("NORECOIL_PITCH_STRENGTH \t%.6f\n", m_norecoilPitchStrength);
         printf("NORECOIL_YAW_STRENGTH \t\t%.6f\n", m_norecoilYawStrength);
@@ -146,10 +136,6 @@ public:
     {
         return m_featureSenseOn;
     }
-    bool isTriggerbotOn()
-    {
-        return m_featureTriggerbotOn;
-    }
 
     // aimbot
     int getAimbotTrigger()
@@ -169,12 +155,6 @@ public:
         return m_aimbotMaxRange;
     }
 
-    // triggerbot
-    int getTriggerbotTrigger()
-    {
-        return m_triggerbotTrigger;
-    }
-    
     // norecoil
     double getNorecoilPitchStrength()
     {

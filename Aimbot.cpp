@@ -42,20 +42,35 @@ public:
 
     void update()
     {
-        // If the aimbot button is not pressed, end the session and reset the target.
-        if (!m_x11Utils->keyDown(m_configLoader->getAimbotTrigger()))
+        // Check if our trigger is a button
+        if (m_configLoader->getAimbotTrigger() != 0x0000) 
         {
-            m_lockedOnPlayer = nullptr;
-            m_inSession = false;
-            return;
-        }
-        // If the session has not started, start a new session and select a new target.
-        else if (!m_inSession)
-        {
-            m_lockedOnPlayer = findClosestEnemy();
-            m_inSession = true;
-            printf("New player locked: %p\n", (void*)m_lockedOnPlayer);  // Debug print
-        }
+            // If the aimbot button is not pressed, end the session and reset the target.
+            if (!m_x11Utils->keyDown(m_configLoader->getAimbotTrigger())) 
+            {
+                m_lockedOnPlayer = nullptr;
+                m_inSession = false;
+                return;
+            }
+            // If the session has not started and aim key is pressed and no player is currently locked on, start a new session and select a new target.
+            else if (!m_inSession) 
+            {
+                m_lockedOnPlayer = findClosestEnemy();
+                if (m_lockedOnPlayer != nullptr) 
+                {
+                    m_inSession = true;
+                }
+            }
+            // If the target is not visible or is null, return.
+            else if (m_lockedOnPlayer == nullptr) 
+            {
+                return;
+            }
+            else if (!m_lockedOnPlayer->isVisible()) 
+            {
+                return;
+            }
+	    }
         if (!m_level->isPlayable())
         {
             m_lockedOnPlayer = nullptr;
@@ -95,10 +110,16 @@ public:
         }
         else
         {
-            if (m_lockedOnPlayer == nullptr || !m_lockedOnPlayer->isVisible())
-                m_lockedOnPlayer = findClosestEnemy();
+
             if (m_lockedOnPlayer == nullptr)
+            {
                 return;
+            }
+            //if (!m_lockedOnPlayer->isVisible())
+            //{
+            //    printf("Locked on target is not visible.\n");
+            //    return;
+            //}
             double distanceToTarget = math::calculateDistanceInMeters(m_localPlayer->getLocationX(),
                                                                       m_localPlayer->getLocationY(),
                                                                       m_localPlayer->getLocationZ(),
@@ -118,7 +139,6 @@ public:
                                                           m_lockedOnPlayer->getLocationY(),
                                                           m_lockedOnPlayer->getLocationZ());
         }
-
         // Setup Pitch
         const double pitch = m_localPlayer->getPitch();
         const double pitchAngleDelta = calculatePitchAngleDelta(pitch, desiredViewAnglePitch);
@@ -135,6 +155,7 @@ public:
         double newYaw = flipYawIfNeeded(yaw + (angleDelta / m_configLoader->getAimbotSmoothing()));
         m_localPlayer->setYaw(newYaw);
     }
+
     double flipYawIfNeeded(double angle)
     {
         double myAngle = angle;
@@ -144,11 +165,13 @@ public:
             myAngle = (360 + myAngle);
         return myAngle;
     }
+
     double calculatePitchAngleDelta(double oldAngle, double newAngle)
     {
         double wayA = newAngle - oldAngle;
         return wayA;
     }
+
     double calculateAngleDelta(double oldAngle, double newAngle)
     {
         double wayA = newAngle - oldAngle;
@@ -159,6 +182,7 @@ public:
             return wayA;
         return wayB;
     }
+
     double calculateDesiredYaw(
         double localPlayerLocationX,
         double localPlayerLocationY,
@@ -171,6 +195,7 @@ public:
         const double yawInDegrees = yawInRadians * (180 / M_PI);
         return yawInDegrees;
     }
+
     double calculateDesiredPitch(
         double localPlayerLocationX,
         double localPlayerLocationY,
@@ -185,6 +210,7 @@ public:
         const double pitchInDegrees = pitchInRadians * (180 / M_PI);
         return pitchInDegrees;
     }
+
     Player *findClosestEnemy()
     {
         Player *closestPlayerSoFar = nullptr;
@@ -212,7 +238,6 @@ public:
             }
             else
             {
-
                 if (abs(angleDelta) < closestPlayerAngleSoFar)
                 {
                     closestPlayerSoFar = player;
@@ -223,3 +248,4 @@ public:
         return closestPlayerSoFar;
     }
 };
+

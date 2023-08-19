@@ -49,17 +49,39 @@ public:
             m_inSession = false;
             return;
         }
-        // If the session has not started, start a new session and select a new target.
-        else if (!m_inSession)
+        // If the session has not started and aim key is pressed and no player is currently locked on, start a new session and select a new target.
+        if (!m_inSession&&m_x11Utils->keyDown(m_configLoader->getAimbotTrigger()))
         {
             m_lockedOnPlayer = findClosestEnemy();
             m_inSession = true;
+
         }
-        // If the target is not valid or is not visible, keep the mouse where it is and return.
-        else if (m_lockedOnPlayer == nullptr || !m_lockedOnPlayer->isVisible())
+        // If the target is not visible, keep the mouse where it is and return.
+        else if (!m_lockedOnPlayer->isVisible())
         {
             return;
         }
+        if (!m_level->isPlayable())
+        {
+            m_lockedOnPlayer = nullptr;
+            return;
+        }
+        if (m_localPlayer->isDead())
+        {
+            m_lockedOnPlayer = nullptr;
+            return;
+        }
+        if (m_localPlayer->isKnocked())
+        {
+            m_lockedOnPlayer = nullptr;
+            return;
+        }
+        if (m_configLoader->getAimbotTrigger() == 0x0000) // our trigger is localplayer attacking
+            if (!m_localPlayer->isInAttack())
+            {
+                m_lockedOnPlayer = nullptr;
+                return;
+            }
 
         // get desired angle to an enemy
         double desiredViewAngleYaw = 0;
@@ -78,10 +100,14 @@ public:
         }
         else
         {
-            if (m_lockedOnPlayer == nullptr || !m_lockedOnPlayer->isVisible())
+            if (m_lockedOnPlayer == nullptr || !m_lockedOnPlayer->isVisible()){
                 m_lockedOnPlayer = findClosestEnemy();
-            if (m_lockedOnPlayer == nullptr)
+                printf("New player locked: %p\n", (void*)m_lockedOnPlayer); // Debug print
+            }
+            if (m_lockedOnPlayer == nullptr){
+                printf("Stop the aimbot.\n"); // Debug print
                 return;
+            }
             double distanceToTarget = math::calculateDistanceInMeters(m_localPlayer->getLocationX(),
                                                                       m_localPlayer->getLocationY(),
                                                                       m_localPlayer->getLocationZ(),

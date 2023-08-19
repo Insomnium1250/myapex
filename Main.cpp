@@ -14,6 +14,7 @@
 #include "Aimbot.cpp"
 #include "X11Utils.cpp"
 #include "ConfigLoader.cpp"
+#include "Triggerbot.cpp"
 
 int main(int argc, char *argv[])
 {
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
     
     Aimbot *aimbot = new Aimbot(configLoader, level, localPlayer, players, x11Utils);  // Instantiate Aimbot before Sense
     Sense *sense = new Sense(configLoader, level, localPlayer, players, x11Utils, aimbot);  // Pass the Aimbot instance to Sense
+    Triggerbot *triggerbot = new Triggerbot(configLoader, level, localPlayer, players, x11Utils); // Instantiate Triggerbot
     NoRecoil *noRecoil = new NoRecoil(configLoader, level, localPlayer, players, x11Utils);
 
 
@@ -71,6 +73,9 @@ int main(int argc, char *argv[])
 
             if (configLoader->isSenseOn())
                 sense->update();
+            
+            if (configLoader->isTriggerbotOn())
+                triggerbot->update();
 
             // all ran fine
             if (counter % 1000 == 0)
