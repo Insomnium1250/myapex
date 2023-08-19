@@ -85,6 +85,9 @@ public:
                     randomDelayBeforeShooting();
                     m_x11Utils->mouseClick(Button1);  // Trigger a shot using X11 after the delay
                     printf("Triggerbot shot at %p\n", (void*)player);
+
+                    // Break out of the loop after shooting.
+                    break;
                 }
             }
         }
