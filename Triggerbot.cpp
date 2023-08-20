@@ -78,13 +78,14 @@ public:
                                                                     player->getLocationZ());
 
                 double angleDeltaPitch = calculatePitchAngleDelta(m_localPlayer->getPitch(), desiredViewAnglePitch);
-
+                double distanceToTarget = math::calculateDistanceInMeters(m_localPlayer->getLocationX(), m_localPlayer->getLocationY(), m_localPlayer->getLocationZ(), player->getLocationX(), player->getLocationY(), player->getLocationZ());
+                double angleThreshold = getAngleThreshold(distanceToTarget);
+                
                 // If angle difference is within 3 degrees for both yaw and pitch, then shoot
-                if (abs(angleDeltaYaw) <= 5.0) //&& abs(angleDeltaPitch) <= 3.0)
+                if (abs(angleDeltaYaw) <= angleThreshold) //&& abs(angleDeltaPitch) <= 2.0)
                 {
                     randomDelayBeforeShooting();
                     m_x11Utils->mouseClick(Button1);  // Trigger a shot using X11 after the delay
-                    printf("Triggerbot shot at %p\n", (void*)player);
 
                     // Break out of the loop after shooting.
                     break;
@@ -131,5 +132,16 @@ public:
 
         int delay = dist(mt);
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-    }    
+    }
+    double getAngleThreshold(double distanceToTarget) 
+    {
+        // Calculate yaw based on the target's half width and distance to the target
+        double yaw = atan(0.3 / distanceToTarget) * (180 / M_PI);  // Convert from radians to degrees
+
+        // You can add a safety margin here if you like, to increase the yaw slightly.
+        // For example:
+        // yaw *= 1.1;  // 10% safety margin
+
+        return yaw;
+    }
 };
