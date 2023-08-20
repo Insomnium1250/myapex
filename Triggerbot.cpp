@@ -140,7 +140,7 @@ public:
 
         // You can add a safety margin here if you like, to increase the yaw slightly.
         // For example:
-        // yaw *= 1.1;  // 10% safety margin
+        yaw *= 1.2;  // 10% safety margin
 
         return yaw;
     }
