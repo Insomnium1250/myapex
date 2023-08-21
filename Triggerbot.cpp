@@ -78,13 +78,18 @@ public:
                                                                     player->getLocationZ());
 
                 double angleDeltaPitch = calculatePitchAngleDelta(m_localPlayer->getPitch(), desiredViewAnglePitch);
-                double distanceToTarget = math::calculateDistanceInMeters(m_localPlayer->getLocationX(), m_localPlayer->getLocationY(), m_localPlayer->getLocationZ(), player->getLocationX(), player->getLocationY(), player->getLocationZ());
+                double distanceToTarget = math::calculateDistanceInMeters(m_localPlayer->getLocationX(), 
+                                                                        m_localPlayer->getLocationY(), 
+                                                                        m_localPlayer->getLocationZ(), 
+                                                                        player->getLocationX(), 
+                                                                        player->getLocationY(), 
+                                                                        player->getLocationZ());
                 double angleThreshold = getAngleThreshold(distanceToTarget);
                 
-                // If angle difference is within 3 degrees for both yaw and pitch, then shoot
-                if (abs(angleDeltaYaw) <= angleThreshold) //&& abs(angleDeltaPitch) <= 2.0)
+                // If angle difference is within cetain degrees for both yaw and pitch, then shoot
+                if (abs(angleDeltaYaw) <= angleThreshold) // && abs(angleDeltaPitch) <= angleThreshold)
                 {
-                    randomDelayBeforeShooting();
+                    //randomDelayBeforeShooting();
                     m_x11Utils->mouseClick(Button1);  // Trigger a shot using X11 after the delay
 
                     // Break out of the loop after shooting.
@@ -140,7 +145,7 @@ public:
 
         // You can add a safety margin here if you like, to increase the yaw slightly.
         // For example:
-        yaw *= 1.2;  // 10% safety margin
+        yaw *= 1.7;  // 10% safety margin
 
         return yaw;
     }
