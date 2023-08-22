@@ -29,6 +29,45 @@ public:
         : m_configLoader(configLoader), m_level(level), 
           m_localPlayer(localPlayer), m_players(players), m_x11Utils(x11Utils) {}
 
+    Player* findClosestEnemy() 
+    {
+        Player *closestPlayerSoFar = nullptr;
+        double closestPlayerAngleSoFar;
+        for (Player* player : *m_players) 
+        {
+            if (!player->isValid())
+                continue;
+            if (player->isKnocked())
+                continue;
+            if (player->getTeamNumber() == m_localPlayer->getTeamNumber())
+                continue;
+            if (!player->isVisible())
+                continue;
+
+            double desiredViewAngleYaw = calculateDesiredYaw(m_localPlayer->getLocationX(),
+                                                             m_localPlayer->getLocationY(),
+                                                             player->getLocationX(),
+                                                             player->getLocationY());
+            double angleDelta = calculateAngleDelta(m_localPlayer->getYaw(), desiredViewAngleYaw);
+
+            if (closestPlayerSoFar == nullptr)
+            {
+                closestPlayerSoFar = player;
+                closestPlayerAngleSoFar = abs(angleDelta);
+            }
+            else
+            {
+                if (abs(angleDelta) < closestPlayerAngleSoFar)
+                {
+                    closestPlayerSoFar = player;
+                    closestPlayerAngleSoFar = abs(angleDelta);
+                }
+            }
+        }
+        return closestPlayerSoFar;
+    }
+          
+
     void update()
     {
         // Check if our trigger is a button
@@ -54,51 +93,35 @@ public:
             return;
         }
 
-        // Iterate through each player
-        for (Player* player : *m_players) 
+        Player* closestPlayer = findClosestEnemy();
+
+        // Validate player conditions
+        if (closestPlayer && closestPlayer->isValid())
         {
-            // Validate player conditions
-            if (player && player->isValid() && !player->isDead() && 
-                !player->isKnocked() && player->isVisible() && 
-                player->getTeamNumber() != m_localPlayer->getTeamNumber())
+            // Calculate desired angles to this player
+            double desiredViewAngleYaw = calculateDesiredYaw(m_localPlayer->getLocationX(),
+                                                            m_localPlayer->getLocationY(),
+                                                            closestPlayer->getLocationX(),
+                                                            closestPlayer->getLocationY());
+
+            double angleDeltaYaw = calculateAngleDelta(m_localPlayer->getYaw(), desiredViewAngleYaw);
+
+            double distanceToTarget = math::calculateDistanceInMeters(m_localPlayer->getLocationX(), 
+                                                                      m_localPlayer->getLocationY(), 
+                                                                      m_localPlayer->getLocationZ(), 
+                                                                      closestPlayer->getLocationX(), 
+                                                                      closestPlayer->getLocationY(), 
+                                                                      closestPlayer->getLocationZ());
+            double angleThreshold = getAngleThreshold(distanceToTarget);
+
+            if (abs(angleDeltaYaw) <= angleThreshold)
             {
-                // Calculate desired angles to this player
-                double desiredViewAngleYaw = calculateDesiredYaw(m_localPlayer->getLocationX(),
-                                                                m_localPlayer->getLocationY(),
-                                                                player->getLocationX(),
-                                                                player->getLocationY());
-
-                double angleDeltaYaw = calculateAngleDelta(m_localPlayer->getYaw(), desiredViewAngleYaw);
-
-                double desiredViewAnglePitch = calculateDesiredPitch(m_localPlayer->getLocationX(),
-                                                                    m_localPlayer->getLocationY(),
-                                                                    m_localPlayer->getLocationZ(),
-                                                                    player->getLocationX(),
-                                                                    player->getLocationY(),
-                                                                    player->getLocationZ());
-
-                double angleDeltaPitch = calculatePitchAngleDelta(m_localPlayer->getPitch(), desiredViewAnglePitch);
-                double distanceToTarget = math::calculateDistanceInMeters(m_localPlayer->getLocationX(), 
-                                                                        m_localPlayer->getLocationY(), 
-                                                                        m_localPlayer->getLocationZ(), 
-                                                                        player->getLocationX(), 
-                                                                        player->getLocationY(), 
-                                                                        player->getLocationZ());
-                double angleThreshold = getAngleThreshold(distanceToTarget);
-                
-                // If angle difference is within cetain degrees for both yaw and pitch, then shoot
-                if (abs(angleDeltaYaw) <= angleThreshold) // && abs(angleDeltaPitch) <= angleThreshold)
-                {
-                    //randomDelayBeforeShooting();
-                    m_x11Utils->mouseClick(Button1);  // Trigger a shot using X11 after the delay
-
-                    // Break out of the loop after shooting.
-                    break;
-                }
+                //randomDelayBeforeShooting();
+                m_x11Utils->mouseClick(Button1);  // Trigger a shot using X11
             }
         }
     }
-
+         
     double calculatePitchAngleDelta(double oldAngle, double newAngle)
     {
         return newAngle - oldAngle;
@@ -133,7 +156,7 @@ public:
     {
         std::random_device rd;
         std::mt19937 mt(rd());
-        std::uniform_int_distribution<int> dist(100, 200);  // Random delay between 100ms to 200ms
+        std::uniform_int_distribution<int> dist(50, 100);  // Random delay between 100ms to 200ms
 
         int delay = dist(mt);
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
@@ -145,7 +168,7 @@ public:
 
         // You can add a safety margin here if you like, to increase the yaw slightly.
         // For example:
-        yaw *= 1.7;  // 10% safety margin
+        yaw *= 1.8;  // 10% safety margin
 
         return yaw;
     }

@@ -1,17 +1,17 @@
-    // Updated: 2023-08-09 // GameVersion v4
+    // Updated: 2023-08-22 // GameVersion=v3.0.40.25
              
     #pragma once
     namespace offsets
     {
             // buttons
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            const long IN_ATTACK = (0x07472e98 + 0x8);            // [Buttons] -> in_attack+0x8
+            const long IN_ATTACK = (0x07472f98 + 0x8);            // [Buttons] -> in_attack+0x8
             // core
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             const long REGION = 0x140000000;              // [Mine]          -> Region
             const long LEVEL = 0x16eed90;                 // [Miscellaneous] -> LevelName
-            const long LOCAL_PLAYER = 0x2224528;       // [Miscellaneous] -> AVC_GameMovement+0x8
-            const long ENTITY_LIST = 0x1e743a8;           // [Miscellaneous] -> cl_entitylist
+            const long LOCAL_PLAYER = 0x22245c8;       // [Miscellaneous] -> AVC_GameMovement+0x8
+            const long ENTITY_LIST = 0x1e74448;           // [Miscellaneous] -> cl_entitylist
             // entity
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             const long LOCAL_ORIGIN = 0x0188; // [DataMap.CBaseViewModel]    -> 	m_localOrigin
