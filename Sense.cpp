@@ -7,6 +7,7 @@
 #include "X11Utils.cpp"
 #include "ConfigLoader.cpp"
 #include "Aimbot.cpp"
+#include "Triggerbot.cpp"
 
 class Sense
 {
@@ -17,22 +18,27 @@ private:
     std::vector<Player *> *m_players;
     X11Utils *m_x11Utils;
     Aimbot *m_aimbot;  // added aimbot reference
+	Triggerbot *m_triggerbot;  // added triggerbot reference
+
 
 public:
-    Sense(ConfigLoader *configLoader,
-          Level *level,
-          LocalPlayer *localPlayer,
-          std::vector<Player *> *players,
-          X11Utils *x11Utils,
-          Aimbot *aimbot)  // added aimbot parameter
-    {
-        m_configLoader = configLoader;
-        m_level = level;
-        m_localPlayer = localPlayer;
-        m_players = players;
-        m_x11Utils = x11Utils;
-        m_aimbot = aimbot;  // assign aimbot
-    }
+	Sense(ConfigLoader *configLoader,
+		  Level *level,
+		  LocalPlayer *localPlayer,
+		  std::vector<Player *> *players,
+		  X11Utils *x11Utils,
+		  Aimbot *aimbot,  // added comma here
+		  Triggerbot *triggerbot)  // added triggerbot parameter
+		  
+	{
+		m_configLoader = configLoader;
+		m_level = level;
+		m_localPlayer = localPlayer;
+		m_players = players;
+		m_x11Utils = x11Utils;
+		m_aimbot = aimbot;  // assign aimbot
+		m_triggerbot = triggerbot;  // assign triggerbot
+	}
     void update()  
     {
 	    if (!m_level->isPlayable())
@@ -56,6 +62,13 @@ public:
 		    player->setGlowColorGreen(0);
 		    player->setGlowColorBlue(0);
 		}
+		// If this player is the current target of the triggerbot, make them purple
+        else if (player == m_triggerbot->getclosestPlayer())
+        {
+            player->setGlowColorRed(0);
+            player->setGlowColorGreen(0);
+            player->setGlowColorBlue(1);
+        }
 		// If player is visible, make them green
 		else if (player->isVisible())
 		{

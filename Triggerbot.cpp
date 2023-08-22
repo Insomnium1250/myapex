@@ -20,6 +20,9 @@ private:
     std::vector<Player *> *m_players;
     X11Utils *m_x11Utils;
 
+    bool m_inSession = false;
+    Player *closestPlayer = nullptr;
+
 public:
     Triggerbot(ConfigLoader *configLoader,
            Level *level,
@@ -28,6 +31,12 @@ public:
            X11Utils *x11Utils)
         : m_configLoader(configLoader), m_level(level), 
           m_localPlayer(localPlayer), m_players(players), m_x11Utils(x11Utils) {}
+
+
+    Player *getclosestPlayer()
+    {
+        return closestPlayer;
+    }
 
     Player* findClosestEnemy() 
     {
@@ -70,33 +79,33 @@ public:
 
     void update()
     {
-        // Check if our trigger is a button
+    // Check if our trigger is a button
         if (m_configLoader->getTriggerbotTrigger() != 0x0000) 
         {
-            // If the triggerbot button is not pressed.
+            // If the triggerbot button is not pressed, end the session.
             if (!m_x11Utils->keyDown(m_configLoader->getTriggerbotTrigger())) 
             {
+                m_inSession = false;
                 return;
             }
-	    }
+            // If the session has not started and trigger key is pressed, start a new session and select a new target.
+            else if (!m_inSession) 
+            {
+                m_inSession = true;
+            }
+        }
         
-        if (!m_level->isPlayable())
+        // Validate if the game is playable, the player is not dead or knocked
+        if (!m_level->isPlayable() || m_localPlayer->isDead() || m_localPlayer->isKnocked())
         {
-            return;
-        }
-        if (m_localPlayer->isDead())
-        {   
-            return;
-        }
-        if (m_localPlayer->isKnocked())
-        {
+            m_inSession = false;
             return;
         }
 
         Player* closestPlayer = findClosestEnemy();
 
         // Validate player conditions
-        if (closestPlayer && closestPlayer->isValid())
+        if (m_inSession && closestPlayer != nullptr && closestPlayer->isValid())
         {
             // Calculate desired angles to this player
             double desiredViewAngleYaw = calculateDesiredYaw(m_localPlayer->getLocationX(),
@@ -107,19 +116,22 @@ public:
             double angleDeltaYaw = calculateAngleDelta(m_localPlayer->getYaw(), desiredViewAngleYaw);
 
             double distanceToTarget = math::calculateDistanceInMeters(m_localPlayer->getLocationX(), 
-                                                                      m_localPlayer->getLocationY(), 
-                                                                      m_localPlayer->getLocationZ(), 
-                                                                      closestPlayer->getLocationX(), 
-                                                                      closestPlayer->getLocationY(), 
-                                                                      closestPlayer->getLocationZ());
+                                                                    m_localPlayer->getLocationY(), 
+                                                                    m_localPlayer->getLocationZ(), 
+                                                                    closestPlayer->getLocationX(), 
+                                                                    closestPlayer->getLocationY(), 
+                                                                    closestPlayer->getLocationZ());
             double angleThreshold = getAngleThreshold(distanceToTarget);
 
             if (abs(angleDeltaYaw) <= angleThreshold)
             {
-                //randomDelayBeforeShooting();
                 m_x11Utils->mouseClick(Button1);  // Trigger a shot using X11
             }
         }
+        else
+        {
+            m_inSession = false;
+        }    
     }
          
     double calculatePitchAngleDelta(double oldAngle, double newAngle)
@@ -156,7 +168,7 @@ public:
     {
         std::random_device rd;
         std::mt19937 mt(rd());
-        std::uniform_int_distribution<int> dist(50, 100);  // Random delay between 100ms to 200ms
+        std::uniform_int_distribution<int> dist(25, 50);  // Random delay between 100ms to 200ms
 
         int delay = dist(mt);
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
@@ -168,8 +180,9 @@ public:
 
         // You can add a safety margin here if you like, to increase the yaw slightly.
         // For example:
-        yaw *= 1.8;  // 10% safety margin
+        yaw *= 2.0;  // 10% safety margin
 
         return yaw;
     }
+    
 };

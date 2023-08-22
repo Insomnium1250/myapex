@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
     }
     
     Aimbot *aimbot = new Aimbot(configLoader, level, localPlayer, players, x11Utils);  // Instantiate Aimbot before Sense
-    Sense *sense = new Sense(configLoader, level, localPlayer, players, x11Utils, aimbot);  // Pass the Aimbot instance to Sense
     Triggerbot *triggerbot = new Triggerbot(configLoader, level, localPlayer, players, x11Utils); // Instantiate Triggerbot
+    Sense *sense = new Sense(configLoader, level, localPlayer, players, x11Utils, aimbot, triggerbot);  // Pass the Aimbot instance to Sense
     NoRecoil *noRecoil = new NoRecoil(configLoader, level, localPlayer, players, x11Utils);
 
 
