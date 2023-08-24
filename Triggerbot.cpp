@@ -20,8 +20,10 @@ private:
     std::vector<Player *> *m_players;
     X11Utils *m_x11Utils;
 
-    bool m_inSession = false;
     Player *closestPlayer = nullptr;
+
+    bool m_inSession = false;
+
 
 public:
     Triggerbot(ConfigLoader *configLoader,
@@ -35,6 +37,10 @@ public:
 
     Player *getclosestPlayer()
     {
+        if (closestPlayer) 
+        {
+            printf("Triggerbot's closest player: %s\n", closestPlayer->getName().c_str());
+        } 
         return closestPlayer;
     }
 
@@ -85,27 +91,34 @@ public:
             // If the triggerbot button is not pressed, end the session.
             if (!m_x11Utils->keyDown(m_configLoader->getTriggerbotTrigger())) 
             {
+                closestPlayer = nullptr;
                 m_inSession = false;
                 return;
             }
             // If the session has not started and trigger key is pressed, start a new session and select a new target.
-            else if (!m_inSession) 
+            else if (!m_inSession)
             {
-                m_inSession = true;
+                closestPlayer = findClosestEnemy();
+                if (closestPlayer != nullptr) 
+                {
+                    m_inSession = true;
+                }
             }
         }
         
         // Validate if the game is playable, the player is not dead or knocked
         if (!m_level->isPlayable() || m_localPlayer->isDead() || m_localPlayer->isKnocked())
         {
-            m_inSession = false;
+            closestPlayer = nullptr;
             return;
         }
 
-        Player* closestPlayer = findClosestEnemy();
-
+        if (closestPlayer == nullptr)
+        {
+            return;
+        }
         // Validate player conditions
-        if (m_inSession && closestPlayer != nullptr && closestPlayer->isValid())
+        if (m_inSession == true && closestPlayer != nullptr && closestPlayer->isValid())
         {
             // Calculate desired angles to this player
             double desiredViewAngleYaw = calculateDesiredYaw(m_localPlayer->getLocationX(),

@@ -65,10 +65,11 @@ public:
 		// If this player is the current target of the triggerbot, make them purple
         else if (player == m_triggerbot->getclosestPlayer())
         {
-            player->setGlowColorRed(0);
+            player->setGlowColorRed(1);
             player->setGlowColorGreen(0);
             player->setGlowColorBlue(1);
-        }
+			printf("Trying to apply purple glow to player: %s\n", player->getName().c_str());        
+		}
 		// If player is visible, make them green
 		else if (player->isVisible())
 		{
