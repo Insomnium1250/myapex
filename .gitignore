@@ -1,8 +1,8 @@
 .vscode/
 Main
 a.out
-librocesshider.c
-librocesshider.so
+libprocesshider.c
+libprocesshider.so
 Backup/
 Refactored/
 
