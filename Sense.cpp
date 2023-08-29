@@ -67,8 +67,7 @@ public:
         {
             player->setGlowColorRed(1);
             player->setGlowColorGreen(0);
-            player->setGlowColorBlue(1);
-			printf("Trying to apply purple glow to player: %s\n", player->getName().c_str());        
+            player->setGlowColorBlue(1);      
 		}
 		// If player is visible, make them green
 		else if (player->isVisible())

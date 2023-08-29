@@ -37,10 +37,6 @@ public:
 
     Player *getclosestPlayer()
     {
-        if (closestPlayer) 
-        {
-            printf("Triggerbot's closest player: %s\n", closestPlayer->getName().c_str());
-        } 
         return closestPlayer;
     }
 
@@ -118,7 +114,9 @@ public:
             return;
         }
         // Validate player conditions
-        if (m_inSession == true && closestPlayer != nullptr && closestPlayer->isValid())
+        if (m_inSession == true && closestPlayer != nullptr && 
+            closestPlayer->isValid() && closestPlayer->isVisible() && 
+            !closestPlayer->isKnocked()) 
         {
             // Calculate desired angles to this player
             double desiredViewAngleYaw = calculateDesiredYaw(m_localPlayer->getLocationX(),
@@ -138,12 +136,13 @@ public:
 
             if (abs(angleDeltaYaw) <= angleThreshold)
             {
+                //randomDelayBeforeShooting();
                 m_x11Utils->mouseClick(Button1);  // Trigger a shot using X11
             }
         }
         else
         {
-            m_inSession = false;
+            return;
         }    
     }
          
